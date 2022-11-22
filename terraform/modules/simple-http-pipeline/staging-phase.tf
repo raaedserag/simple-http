@@ -1,4 +1,13 @@
-
+locals {
+  environment_variables = merge(
+    var.staging_environment_config.environment_variables,
+    {
+      AWS_DEFAULT_REGION = data.aws_region.default.name
+      AWS_ACCOUNT_ID     = data.aws_caller_identity.default.account_id
+      IMAGE_NAME         = var.staging_environment_config.image_repository_url
+    }
+  )
+}
 resource "aws_codebuild_project" "build_images" {
   name          = "build-${var.staging_environment_config.name}-simple-http"
   description   = "Builds the Docker images for the simple-http application"
@@ -18,17 +27,12 @@ resource "aws_codebuild_project" "build_images" {
     compute_type                = "BUILD_GENERAL1_SMALL"
     image_pull_credentials_type = "CODEBUILD"
     privileged_mode             = true
-    environment_variable {
-      name  = "AWS_DEFAULT_REGION"
-      value = data.aws_region.current.name
-    }
-    environment_variable {
-      name  = "AWS_ACCOUNT_ID"
-      value = data.aws_caller_identity.current.account_id
-    }
-    environment_variable {
-      name  = "IMAGE_NAME"
-      value = var.staging_environment_config.image_repository_url
+    dynamic "environment_variable" {
+      for_each = local.environment_variables
+      content {
+        name  = environment_variable.key
+        value = environment_variable.key
+      }
     }
   }
 

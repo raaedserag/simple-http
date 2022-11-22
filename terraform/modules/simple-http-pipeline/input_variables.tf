@@ -11,6 +11,7 @@ variable "staging_environment_config" {
     name                 = string
     image_repository_url = string
     image_repository_arn = string
+    environment_variables = map(string)
   })
   description = "The configuration of staging environment"
 }
@@ -19,6 +20,7 @@ variable "production_environment_config" {
     name                 = string
     image_repository_url = string
     image_repository_arn = string
+    environment_variables = map(string)
   })
   description = "The configuration of staging environment"
 }

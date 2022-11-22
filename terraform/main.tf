@@ -95,10 +95,12 @@ module "simple_http_pipeline" {
     name                 = "staging"
     image_repository_url = "${module.simple_app_staging_setup.ecr_repo.repository_url}"
     image_repository_arn = "${module.simple_app_staging_setup.ecr_repo.arn}"
+    environment_variables = module.simple_app_staging_setup.app_environment_variables
   }
   production_environment_config = {
     name                 = "production"
     image_repository_url = "${module.simple_app_production_setup.ecr_repo.repository_url}"
     image_repository_arn = "${module.simple_app_production_setup.ecr_repo.arn}"
+    environment_variables = module.simple_app_production_setup.app_environment_variables
   }
 }
