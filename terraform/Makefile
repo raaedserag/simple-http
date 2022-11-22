@@ -21,3 +21,4 @@ destroy:
 	terraform destroy -auto-approve
 k8s_config:
 	aws eks update-kubeconfig --name simple-http-k8s
+	kubectl config set-context --current --namespace=simplehttp-staging

@@ -42,15 +42,18 @@ resource "kubernetes_secret" "environment_variables" {
 
 }
 
-resource "kubernetes_replication_controller" "simple-http-deployment" {
+
+resource "kubernetes_deployment" "simple-http-deployment" {
   metadata {
     name      = "${var.app_name}-${var.environment}-deployment"
     namespace = kubernetes_namespace.current_namespace.metadata.0.name
     labels    = local.labels
   }
   spec {
-    replicas          = var.app_replicas_count
-    selector          = local.labels
+    replicas = var.app_replicas_count
+    selector {
+      match_labels = local.labels
+    }
     min_ready_seconds = 10
     template {
       metadata {
@@ -60,8 +63,9 @@ resource "kubernetes_replication_controller" "simple-http-deployment" {
       }
       spec {
         container {
-          name  = "${var.app_name}-${var.environment}-api"
-          image = aws_ecr_repository.default_repo.repository_url
+          name = "${var.app_name}-${var.environment}-api"
+          # image = aws_ecr_repository.default_repo.repository_url
+          image = "httpd:2.4"
           port {
             name           = "http"
             container_port = local.app_environment_variables.PORT
@@ -99,6 +103,13 @@ resource "kubernetes_replication_controller" "simple-http-deployment" {
         }
       }
     }
+    strategy {
+      type = "RollingUpdate"
+      rolling_update {
+        max_surge       = "50%"
+        max_unavailable = "0"
+      }
+    }
   }
 }
 
@@ -119,3 +130,4 @@ resource "kubernetes_service" "simple-http-service" {
 
   }
 }
+
