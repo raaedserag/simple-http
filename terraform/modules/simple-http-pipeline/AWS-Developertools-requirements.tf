@@ -40,7 +40,9 @@ resource "aws_iam_role" "pipeline_role" {
           Effect = "Allow"
           Resource = [
             var.staging_environment_config.image_repository_arn,
-            var.production_environment_config.image_repository_arn
+            "${var.staging_environment_config.image_repository_arn}/*",
+            var.production_environment_config.image_repository_arn,
+            "${var.production_environment_config.image_repository_arn}/*"
           ]
         },
         {
