@@ -73,7 +73,12 @@ resource "aws_iam_role" "pipeline_role" {
         {
           Action = [
             "codebuild:BatchGetBuilds",
-            "codebuild:StartBuild"
+            "codebuild:StartBuild",
+            "codebuild:CreateReportGroup",
+            "codebuild:CreateReport",
+            "codebuild:UpdateReport",
+            "codebuild:BatchPutTestCases",
+            "codebuild:BatchPutCodeCoverages"
           ]
           Effect   = "Allow"
           Resource = "*"

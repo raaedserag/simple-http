@@ -6,7 +6,6 @@ phases:
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   build:
     commands:
-      - env
       - echo Build started on `date`
       - echo Building the Docker image...
       - docker build -t $IMAGE_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION --build-arg dynamic_node_env=$NODE_ENV simple-nodejs-http-app
@@ -15,12 +14,12 @@ phases:
     commands:
       - echo Build completed on `date`
       - echo Running the unit tests...
-      - docker run -e NODE_ENV=$NODE_ENV $IMAGE_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION test
+      - docker run -v $(pwd)/test-results:/usr/http-app/test-results -e NODE_ENV=$NODE_ENV $IMAGE_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION test
       - echo Pushing the Docker image...
       - docker push $IMAGE_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
 reports:
   jest_reports:
     files:
-      - results.xml
+      - simple-http-api-results.xml
     file-format: JUNITXML
-    base-directory: simple-nodejs-http-app/test-results/jest
+    base-directory: /usr/http-app/test-results/jest
