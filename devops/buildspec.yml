@@ -24,4 +24,4 @@ reports:
     files:
       - simple-http-api-results.xml
     file-format: JUNITXML
-    base-directory: /usr/http-app/test-results/jest
+    base-directory: test-results/jest
