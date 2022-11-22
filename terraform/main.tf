@@ -93,8 +93,7 @@ module "simple_app_production_k8s" {
 
 module "simple_http_pipeline"{
   source = "./modules/simple-http-pipeline"
-  github_repository_name = var.github_repository_name
-  github_repository_branch = var.github_repository_branch
+  repository_branch = var.repository_branch
   staging_environment_config = {
     name = "staging"
     # image_name = "${module.eks_cluster.simple_http_ecr_repo.repository_url}:staging"

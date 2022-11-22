@@ -10,5 +10,4 @@ app_static_environment_variables = {
   NODE_CONFIG_DIR = "./src/config/environments"
 }
 app_replicas_count       = 2
-github_repository_name   = "BespinGlobalMEA/cloud-devops-engineer-hiring---bespinglobal-mea-raaedserag"
-github_repository_branch = "dev"
+repository_branch = "master"

@@ -9,7 +9,7 @@ resource "aws_codebuild_project" "build_images" {
     buildspec = "devops/buildspec.yml"
   }
   artifacts {
-    type = "NO_ARTIFACTS"
+    type = "CODEPIPELINE"
   }
 
   environment {

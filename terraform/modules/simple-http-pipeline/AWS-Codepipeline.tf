@@ -1,4 +1,4 @@
-resource "aws_codepipeline" "backend_pipeline" {
+resource "aws_codepipeline" "default_pipeline" {
   name     = "simple-http-pipeline"
   role_arn = aws_iam_role.pipeline_role.arn
 
@@ -7,20 +7,21 @@ resource "aws_codepipeline" "backend_pipeline" {
     type     = "S3"
   }
 
+
   stage {
     name = "Source"
     action {
       name             = "Source"
       category         = "Source"
       owner            = "AWS"
-      provider         = "CodeStarSourceConnection"
+      provider         = "CodeCommit"
       version          = "1"
       output_artifacts = ["source_output"]
 
       configuration = {
-        ConnectionArn    = aws_codestarconnections_connection.default_connection.arn
-        FullRepositoryId = var.github_repository_name
-        BranchName       = var.github_repository_branch
+        RepositoryName = data.aws_codecommit_repository.default_repo.repository_name
+        BranchName     = var.repository_branch
+        PollForSourceChanges = "false"
       }
     }
   }

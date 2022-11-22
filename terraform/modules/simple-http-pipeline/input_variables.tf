@@ -1,10 +1,6 @@
-variable "github_repository_name" {
+variable "repository_branch" {
   type        = string
-  description = "The name of the GitHub repository"
-}
-variable "github_repository_branch" {
-  type        = string
-  description = "The name of the GitHub repository branch"
+  description = "The name of the repository branch"
 }
 variable "staging_environment_config" {
   type = object({

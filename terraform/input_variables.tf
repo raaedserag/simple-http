@@ -52,11 +52,7 @@ variable "app_replicas_count" {
   description = "The number of replicas for the application."
   type        = number
 }
-variable "github_repository_name" {
-  description = "The name of the GitHub repository."
-  type        = string
-}
-variable "github_repository_branch" {
-  description = "The name of the GitHub repository branch."
+variable "repository_branch" {
+  description = "The name of the repository branch."
   type        = string
 }

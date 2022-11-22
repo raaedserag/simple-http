@@ -1,13 +1,10 @@
-resource "aws_codestarconnections_connection" "default_connection" {
-  name          = "simple-http-github-connection"
-  provider_type = "GitHub"
-}
 resource "aws_s3_bucket" "codepipeline_bucket" {
   bucket_prefix = "simple-http-pipeline-artifacts"
 }
 resource "aws_cloudwatch_log_group" "pipeline_log_group" {
   name = "/simple-http/pipeline"
 }
+
 resource "aws_iam_role" "pipeline_role" {
   name = "Simplehttp-Codepipeline-Role"
   assume_role_policy = jsonencode({
@@ -31,10 +28,12 @@ resource "aws_iam_role" "pipeline_role" {
       Statement = [
         {
           Action = [
-            "codestar-connections:UseConnection"
+            "codecommit:GitPull",
+            "codecommit:GetBranch"
+
           ]
           Effect   = "Allow"
-          Resource = "${aws_codestarconnections_connection.default_connection.arn}"
+          Resource = "${data.aws_codecommit_repository.default_repo.arn}"
         },
         {
           Action = [
@@ -80,7 +79,5 @@ resource "aws_iam_role" "pipeline_role" {
     })
   }
 }
-
-
 
 
