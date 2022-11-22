@@ -9,16 +9,15 @@ phases:
       - env
       - echo Build started on `date`
       - echo Building the Docker image...
-      - cd simple-nodejs-http-app
-      - docker build -t $IMAGE_NAME --build-arg dynamic_node_env=$NODE_ENV simple-nodejs-http-app
+      - docker build -t $IMAGE_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION --build-arg dynamic_node_env=$NODE_ENV simple-nodejs-http-app
 
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Running the unit tests...
-      - docker run -e NODE_ENV=$NODE_ENV $IMAGE_NAME test
+      - docker run -e NODE_ENV=$NODE_ENV $IMAGE_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION test
       - echo Pushing the Docker image...
-      - docker push $IMAGE_NAME
+      - docker push $IMAGE_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
 reports:
   jest_reports:
     files:
