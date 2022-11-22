@@ -2,8 +2,8 @@ locals {
   environment_variables = merge(
     var.staging_environment_config.environment_variables,
     {
-      AWS_DEFAULT_REGION = data.aws_region.default.name
-      AWS_ACCOUNT_ID     = data.aws_caller_identity.default.account_id
+      AWS_DEFAULT_REGION = data.aws_region.current.name
+      AWS_ACCOUNT_ID     = data.aws_caller_identity.current.account_id
       IMAGE_NAME         = var.staging_environment_config.image_repository_url
     }
   )
@@ -31,7 +31,7 @@ resource "aws_codebuild_project" "build_images" {
       for_each = local.environment_variables
       content {
         name  = environment_variable.key
-        value = environment_variable.key
+        value = environment_variable.value
       }
     }
   }
