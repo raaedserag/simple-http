@@ -10,10 +10,8 @@ phases:
       - echo Building the Docker image...
       - cd simple-nodejs-http-app
       - docker build -t $IMAGE_NAME .
-      - docker tag $IMAGE_NAME $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_NAME
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
-      - echo $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_NAME
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_NAME
+      - docker push $IMAGE_NAME
