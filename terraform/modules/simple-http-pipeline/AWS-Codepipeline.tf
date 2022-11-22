@@ -34,9 +34,25 @@ resource "aws_codepipeline" "default_pipeline" {
       owner           = "AWS"
       provider        = "CodeBuild"
       input_artifacts = ["source_output"]
+      output_artifacts = ["build_output"]
       version         = "1"
       configuration = {
         ProjectName = aws_codebuild_project.build_images.name
+      }
+    }
+  }
+  stage {
+    name = "Deploy"
+
+    action {
+      name            = "Deploy"
+      category        = "Build"
+      owner           = "AWS"
+      provider        = "CodeBuild"
+      version         = "1"
+      input_artifacts = ["build_output"]
+      configuration = {
+        ProjectName = aws_codebuild_project.deploy.name
       }
     }
   }

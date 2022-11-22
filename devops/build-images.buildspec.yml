@@ -14,8 +14,9 @@ phases:
       - docker run -v $(pwd)/test-results:/usr/http-app/test-results -e NODE_ENV=$NODE_ENV $IMAGE_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION test
       - echo Pushing the Docker image...
       - docker push $IMAGE_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
-      - echo $(pwd)
-      - ls
+  post_build:
+    commands:
+      - echo Build finished on `date`
 reports:
   jest_reports:
     files:
