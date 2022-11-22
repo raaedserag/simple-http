@@ -11,3 +11,4 @@ app_static_environment_variables = {
 }
 app_replicas_count       = 2
 repository_branch = "master"
+code_commit_repo_name = "simple-http-repo"

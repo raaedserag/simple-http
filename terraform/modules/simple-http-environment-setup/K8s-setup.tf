@@ -17,6 +17,13 @@ locals {
     }
   )
 }
+resource "aws_ecr_repository" "default_repo" {
+  name                 = "${var.app_name}-${var.environment}"
+  image_tag_mutability = "MUTABLE"
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
 resource "kubernetes_namespace" "current_namespace" {
   metadata {
     labels = local.labels
@@ -54,7 +61,7 @@ resource "kubernetes_replication_controller" "simple-http-deployment" {
       spec {
         container {
           name  = "${var.app_name}-${var.environment}-api"
-          image = var.app_container_image
+          image = aws_ecr_repository.default_repo.repository_url
           port {
             name           = "http"
             container_port = local.app_environment_variables.PORT

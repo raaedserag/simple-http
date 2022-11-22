@@ -1,5 +1,5 @@
 data "aws_codecommit_repository" "default_repo" {
-  repository_name = "simple-http-repo"
+  repository_name = var.code_commit_repo_name
 }
 resource "aws_iam_role" "codecommit_events_rule_role" {
   name = "simple-http-codecommit-events-rule-role"

@@ -52,6 +52,10 @@ variable "app_replicas_count" {
   description = "The number of replicas for the application."
   type        = number
 }
+variable "code_commit_repo_name" {
+  description = "The name of the CodeCommit repository."
+  type        = string
+}
 variable "repository_branch" {
   description = "The name of the repository branch."
   type        = string

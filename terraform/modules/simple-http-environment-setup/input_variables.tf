@@ -35,10 +35,6 @@ variable "rds_config" {
   })
   description = "The configuration of the RDS database."
 }
-variable "app_container_image" {
-  type        = string
-  description = "The image of the application."
-}
 variable "app_replicas_count" {
   type        = number
   description = "The number of replicas for the application."

@@ -35,15 +35,13 @@ resource "aws_iam_role" "pipeline_role" {
         },
         {
           Action = [
-            "ecr:BatchCheckLayerAvailability",
-            "ecr:CompleteLayerUpload",
-            "ecr:GetAuthorizationToken",
-            "ecr:InitiateLayerUpload",
-            "ecr:PutImage",
-            "ecr:UploadLayerPart"
+            "ecr:*"
           ]
-          Effect   = "Allow"
-          Resource = "*"
+          Effect = "Allow"
+          Resource = [
+            var.staging_environment_config.image_repository_arn,
+            var.production_environment_config.image_repository_arn
+          ]
         },
         {
           Action = [

@@ -28,7 +28,7 @@ resource "aws_codebuild_project" "build_images" {
     }
     environment_variable {
       name  = "IMAGE_NAME"
-      value = var.staging_environment_config.image_name
+      value = var.staging_environment_config.image_repository_url
     }
   }
 

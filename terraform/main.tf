@@ -44,7 +44,7 @@ module "eks_cluster" {
     module.eks_vpc.subnet_public_b.id
   ]
 }
-module "simple_app_staging_k8s" {
+module "simple_app_staging_setup" {
   source = "./modules/simple-http-environment-setup"
   k8s_cluster_config = {
     endpoint               = module.eks_cluster.simple_http_cluster.endpoint
@@ -63,10 +63,9 @@ module "simple_app_staging_k8s" {
     subnets                     = [module.eks_vpc.subnet_private_a.id, module.eks_vpc.subnet_private_b.id]
     allowed_inbound_cidr_blocks = [module.eks_vpc.subnet_private_a.cidr_block, module.eks_vpc.subnet_private_b.cidr_block]
   }
-  app_container_image = "${module.eks_cluster.simple_http_ecr_repo.repository_url}:staging"
-  app_replicas_count  = var.app_replicas_count
+  app_replicas_count = var.app_replicas_count
 }
-module "simple_app_production_k8s" {
+module "simple_app_production_setup" {
   source = "./modules/simple-http-environment-setup"
   k8s_cluster_config = {
     endpoint               = module.eks_cluster.simple_http_cluster.endpoint
@@ -85,15 +84,21 @@ module "simple_app_production_k8s" {
     subnets                     = [module.eks_vpc.subnet_private_a.id, module.eks_vpc.subnet_private_b.id]
     allowed_inbound_cidr_blocks = [module.eks_vpc.subnet_private_a.cidr_block, module.eks_vpc.subnet_private_b.cidr_block]
   }
-  app_container_image = "${module.eks_cluster.simple_http_ecr_repo.repository_url}:production"
-  app_replicas_count  = var.app_replicas_count
+  app_replicas_count = var.app_replicas_count
 }
 
-module "simple_http_pipeline"{
-  source = "./modules/simple-http-pipeline"
-  repository_branch = var.repository_branch
+module "simple_http_pipeline" {
+  source                = "./modules/simple-http-pipeline"
+  code_commit_repo_name = var.code_commit_repo_name
+  repository_branch     = var.repository_branch
   staging_environment_config = {
-    name = "staging"
-    image_name = "${module.eks_cluster.simple_http_ecr_repo.repository_url}:staging"
+    name                 = "staging"
+    image_repository_url = "${module.simple_app_staging_setup.ecr_repo.repository_url}"
+    image_repository_arn = "${module.simple_app_staging_setup.ecr_repo.arn}"
+  }
+  production_environment_config = {
+    name                 = "production"
+    image_repository_url = "${module.simple_app_production_setup.ecr_repo.repository_url}"
+    image_repository_arn = "${module.simple_app_production_setup.ecr_repo.arn}"
   }
 }
