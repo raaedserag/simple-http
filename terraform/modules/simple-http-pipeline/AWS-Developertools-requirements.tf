@@ -41,6 +41,7 @@ resource "aws_iam_role" "pipeline_role" {
           Resource = [
             var.staging_environment_config.image_repository_arn,
             var.production_environment_config.image_repository_arn,
+            "arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/node"
           ]
         },
         {
