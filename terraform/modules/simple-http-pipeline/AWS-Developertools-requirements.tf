@@ -28,9 +28,7 @@ resource "aws_iam_role" "pipeline_role" {
       Statement = [
         {
           Action = [
-            "codecommit:GitPull",
-            "codecommit:GetBranch"
-
+            "codecommit:*"
           ]
           Effect   = "Allow"
           Resource = "${data.aws_codecommit_repository.default_repo.arn}"

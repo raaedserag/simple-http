@@ -63,8 +63,7 @@ module "simple_app_staging_k8s" {
     subnets                     = [module.eks_vpc.subnet_private_a.id, module.eks_vpc.subnet_private_b.id]
     allowed_inbound_cidr_blocks = [module.eks_vpc.subnet_private_a.cidr_block, module.eks_vpc.subnet_private_b.cidr_block]
   }
-  # app_container_image = "${module.eks_cluster.simple_http_ecr_repo.repository_url}:staging"
-  app_container_image = "raaedserag/simple-http-server:staging"
+  app_container_image = "${module.eks_cluster.simple_http_ecr_repo.repository_url}:staging"
   app_replicas_count  = var.app_replicas_count
 }
 module "simple_app_production_k8s" {
@@ -86,8 +85,7 @@ module "simple_app_production_k8s" {
     subnets                     = [module.eks_vpc.subnet_private_a.id, module.eks_vpc.subnet_private_b.id]
     allowed_inbound_cidr_blocks = [module.eks_vpc.subnet_private_a.cidr_block, module.eks_vpc.subnet_private_b.cidr_block]
   }
-  # app_container_image = "${module.eks_cluster.simple_http_ecr_repo.repository_url}:production"
-  app_container_image = "raaedserag/simple-http-server:production"
+  app_container_image = "${module.eks_cluster.simple_http_ecr_repo.repository_url}:production"
   app_replicas_count  = var.app_replicas_count
 }
 
@@ -96,7 +94,6 @@ module "simple_http_pipeline"{
   repository_branch = var.repository_branch
   staging_environment_config = {
     name = "staging"
-    # image_name = "${module.eks_cluster.simple_http_ecr_repo.repository_url}:staging"
-    image_name = "raaedserag/simple-http-server:staging"
+    image_name = "${module.eks_cluster.simple_http_ecr_repo.repository_url}:staging"
   }
 }

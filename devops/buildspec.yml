@@ -8,15 +8,11 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - ls
-      - echo $AWS_ACCOUNT_ID
-      - echo $AWS_DEFAULT_REGION
-      - echo $IMAGE_NAME
-      # - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
-      # - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - cd simple-nodejs-http-app
+      - docker build -t $IMAGE_NAME .
+      - docker tag $IMAGE_NAME $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_NAME
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
-      - ls
-      # - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_NAME
