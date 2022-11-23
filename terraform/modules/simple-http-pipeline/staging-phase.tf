@@ -1,5 +1,5 @@
 locals {
-  environment_variables = merge(
+  staging_environment_variables = merge(
     var.staging_environment_config.environment_variables,
     {
       AWS_DEFAULT_REGION         = data.aws_region.current.name
@@ -33,7 +33,7 @@ resource "aws_codebuild_project" "staging_build" {
     image_pull_credentials_type = "CODEBUILD"
     privileged_mode             = true
     dynamic "environment_variable" {
-      for_each = local.environment_variables
+      for_each = local.staging_environment_variables
       content {
         name  = environment_variable.key
         value = environment_variable.value
@@ -68,7 +68,7 @@ resource "aws_codebuild_project" "staging_test" {
     image_pull_credentials_type = "CODEBUILD"
     privileged_mode             = true
     dynamic "environment_variable" {
-      for_each = local.environment_variables
+      for_each = local.staging_environment_variables
       content {
         name  = environment_variable.key
         value = environment_variable.value
@@ -102,7 +102,7 @@ resource "aws_codebuild_project" "staging_deploy" {
     compute_type                = "BUILD_GENERAL1_SMALL"
     image_pull_credentials_type = "CODEBUILD"
     dynamic "environment_variable" {
-      for_each = local.environment_variables
+      for_each = local.staging_environment_variables
       content {
         name  = environment_variable.key
         value = environment_variable.value

@@ -65,4 +65,45 @@ resource "aws_codepipeline" "default_pipeline" {
       run_order = 4
     }
   }
+  stage {
+    name = "ManualApproval"
+    action {
+      name     = "ManualApproval"
+      category = "Approval"
+      owner    = "AWS"
+      provider = "Manual"
+      version  = "1"
+      configuration = {
+        CustomData = "Please review the changes and approve the deployment"
+      }
+      run_order = 5
+    }
+  }
+  stage {
+    name = "Production"
+    action {
+      name            = "Build"
+      category        = "Build"
+      owner           = "AWS"
+      provider        = "CodeBuild"
+      input_artifacts = ["source_output"]
+      version         = "1"
+      configuration = {
+        ProjectName = aws_codebuild_project.production_build.name
+      }
+      run_order = 6
+    }
+    action {
+      name            = "Deploy"
+      category        = "Build"
+      owner           = "AWS"
+      provider        = "CodeBuild"
+      input_artifacts = ["source_output"]
+      version         = "1"
+      configuration = {
+        ProjectName = aws_codebuild_project.production_deploy.name
+      }
+      run_order = 7
+    }
+  }
 }
