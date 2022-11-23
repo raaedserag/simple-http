@@ -1,6 +1,6 @@
 resource "aws_codepipeline" "default_pipeline" {
   name     = "simple-http-pipeline"
-  role_arn = aws_iam_role.pipeline_role.arn
+  role_arn = data.aws_iam_role.k8s_ops_role.arn
 
   artifact_store {
     location = aws_s3_bucket.codepipeline_bucket.bucket

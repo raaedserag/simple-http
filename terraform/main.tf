@@ -44,6 +44,16 @@ module "eks_cluster" {
     module.eks_vpc.subnet_public_b.id
   ]
 }
+module "k8s_config" {
+  source = "./modules/k8s-configuration"
+  k8s_cluster_config = {
+    endpoint               = module.eks_cluster.simple_http_cluster.endpoint
+    cluster_ca_certificate = module.eks_cluster.simple_http_cluster.certificate_authority[0].data
+    name                   = module.eks_cluster.simple_http_cluster.id
+    arn                    = module.eks_cluster.simple_http_cluster.arn
+  }
+  workernodes_role_arn = module.eks_cluster.workernodes_role_arn
+}
 module "simple_app_staging_setup" {
   source = "./modules/simple-http-environment-setup"
   k8s_cluster_config = {
@@ -92,8 +102,9 @@ module "simple_http_pipeline" {
   code_commit_repo_name = var.code_commit_repo_name
   repository_branch     = var.repository_branch
   eks_cluster_config = {
-    name = module.eks_cluster.simple_http_cluster.id
-    arn  = module.eks_cluster.simple_http_cluster.arn
+    name          = module.eks_cluster.simple_http_cluster.id
+    arn           = module.eks_cluster.simple_http_cluster.arn
+    ops_role_name = module.k8s_config.k8s_ops_role_name
   }
   staging_environment_config = {
     name                           = "staging"
@@ -114,3 +125,4 @@ module "simple_http_pipeline" {
     simple_http_app_container_name = module.simple_app_production_setup.simple_http_app_container_name
   }
 }
+

@@ -16,7 +16,13 @@ reconfig:
 plan:
 	terraform plan 
 deploy:
-	terraform apply -auto-approve
+	terraform apply -auto-approve -target=module.eks_vpc
+	terraform apply -auto-approve -target=module.eks_cluster
+	terraform import module.k8s_config.kubernetes_config_map.aws_auth kube-system/aws-auth || true
+	terraform apply -auto-approve -target=module.k8s_config
+	terraform apply -auto-approve -target=module.simple_app_staging_setup
+	terraform apply -auto-approve -target=module.simple_app_production_setup
+	terraform apply -auto-approve -target=module.simple_http_pipeline
 destroy:
 	terraform destroy -auto-approve
 k8s_config:

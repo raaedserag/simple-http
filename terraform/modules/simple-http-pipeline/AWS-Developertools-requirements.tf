@@ -1,3 +1,6 @@
+data "aws_iam_role" "k8s_ops_role" {
+  name = var.eks_cluster_config.ops_role_name
+}
 resource "aws_s3_bucket" "codepipeline_bucket" {
   bucket_prefix = "simple-http-pipeline-artifacts"
 }
@@ -5,25 +8,9 @@ resource "aws_cloudwatch_log_group" "pipeline_log_group" {
   name = "/simple-http/pipeline"
 }
 
-resource "aws_iam_role" "pipeline_role" {
-  name = "Simplehttp-Codepipeline-Role"
-  assume_role_policy = jsonencode({
-    Statement = [{
-      Action = "sts:AssumeRole"
-      Effect = "Allow"
-      Principal = {
-        Service = [
-          "codepipeline.amazonaws.com",
-          "codebuild.amazonaws.com",
-        ]
-      }
-    }]
-    Version = "2012-10-17"
-  })
-  inline_policy {
-    name = "codepipeline_access"
-
-    policy = jsonencode({
+resource "aws_iam_policy" "codepipeline_privileges" {
+  name        = "simplehttp-codepipeline-priviliges"
+  policy = jsonencode({
       Version = "2012-10-17"
       Statement = [
         {
@@ -50,13 +37,6 @@ resource "aws_iam_role" "pipeline_role" {
           ]
           Effect   = "Allow"
           Resource = "*"
-        },
-        {
-          Action = [
-            "eks:DescribeCluster"
-          ],
-          Effect   = "Allow",
-          Resource = "${var.eks_cluster_config.arn}"
         },
         {
           Action = [
@@ -93,7 +73,10 @@ resource "aws_iam_role" "pipeline_role" {
         }
       ]
     })
-  }
 }
 
-
+resource "aws_iam_policy_attachment" "codepipeline_privileges_attachment" {
+  name       = "codepipeline_privileges_attachment"
+  roles      = [data.aws_iam_role.k8s_ops_role.name]
+  policy_arn = aws_iam_policy.codepipeline_privileges.arn
+}

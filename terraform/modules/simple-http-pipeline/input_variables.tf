@@ -8,8 +8,9 @@ variable "repository_branch" {
 }
 variable "eks_cluster_config" {
   type = object({
-    name = string
-    arn  = string
+    name          = string
+    arn           = string
+    ops_role_name = string
   })
   description = "The configuration of the EKS cluster"
 }

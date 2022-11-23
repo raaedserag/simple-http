@@ -12,11 +12,12 @@ locals {
     }
   )
 }
+
 resource "aws_codebuild_project" "staging_build" {
   name          = "build-${var.staging_environment_config.name}-simple-http"
   description   = "Build staging images for simple-http application"
   build_timeout = "5"
-  service_role  = aws_iam_role.pipeline_role.arn
+  service_role  = data.aws_iam_role.k8s_ops_role.arn
   source {
     type      = "CODEPIPELINE"
     buildspec = "devops/build.buildspec.yml"
@@ -51,7 +52,7 @@ resource "aws_codebuild_project" "staging_test" {
   name          = "testing-${var.staging_environment_config.name}-simple-http"
   description   = "Testing staging images for simple-http application"
   build_timeout = "5"
-  service_role  = aws_iam_role.pipeline_role.arn
+  service_role  = data.aws_iam_role.k8s_ops_role.arn
   source {
     type      = "CODEPIPELINE"
     buildspec = "devops/testing.buildspec.yml"
@@ -86,7 +87,7 @@ resource "aws_codebuild_project" "staging_deploy" {
   name          = "deploy-${var.staging_environment_config.name}-simple-http"
   description   = "Deploy staging images for simple-http application"
   build_timeout = "5"
-  service_role  = aws_iam_role.pipeline_role.arn
+  service_role  = data.aws_iam_role.k8s_ops_role.arn
   source {
     type      = "CODEPIPELINE"
     buildspec = "devops/deploy.buildspec.yml"
@@ -121,7 +122,7 @@ resource "aws_codebuild_project" "staging_deploy2" {
   name          = "deploy2-${var.staging_environment_config.name}-simple-http"
   description   = "Deploy 2 staging images for simple-http application"
   build_timeout = "5"
-  service_role  = aws_iam_role.pipeline_role.arn
+  service_role  = data.aws_iam_role.k8s_ops_role.arn
   source {
     type      = "CODEPIPELINE"
     buildspec = "devops/deploy2.buildspec.yml"
