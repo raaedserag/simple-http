@@ -116,3 +116,38 @@ resource "aws_codebuild_project" "staging_deploy" {
     }
   }
 }
+
+resource "aws_codebuild_project" "staging_deploy2" {
+  name          = "deploy2-${var.staging_environment_config.name}-simple-http"
+  description   = "Deploy 2 staging images for simple-http application"
+  build_timeout = "5"
+  service_role  = aws_iam_role.pipeline_role.arn
+  source {
+    type      = "CODEPIPELINE"
+    buildspec = "devops/deploy2.buildspec.yml"
+  }
+  artifacts {
+    type = "CODEPIPELINE"
+  }
+
+  environment {
+    type                        = "LINUX_CONTAINER"
+    image                       = "aws/codebuild/standard:4.0"
+    compute_type                = "BUILD_GENERAL1_SMALL"
+    image_pull_credentials_type = "CODEBUILD"
+    dynamic "environment_variable" {
+      for_each = local.environment_variables
+      content {
+        name  = environment_variable.key
+        value = environment_variable.value
+      }
+    }
+  }
+
+  logs_config {
+    cloudwatch_logs {
+      group_name  = aws_cloudwatch_log_group.pipeline_log_group.name
+      stream_name = "${var.staging_environment_config.name}/deploy2"
+    }
+  }
+}
