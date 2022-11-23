@@ -53,6 +53,13 @@ resource "aws_iam_role" "pipeline_role" {
         },
         {
           Action = [
+            "eks:DescribeCluster"
+          ],
+          Effect   = "Allow",
+          Resource = "${var.eks_cluster_config.arn}"
+        },
+        {
+          Action = [
             "logs:CreateLogGroup",
             "logs:CreateLogStream",
             "logs:PutLogEvents"

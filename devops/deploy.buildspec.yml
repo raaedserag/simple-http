@@ -2,12 +2,12 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME
-      - kubectl config set-context --current --namespace=$EKS_NAMESPACE 
       - DOCKER_IMAGE=$IMAGE_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
   build:
     commands:
       - echo Deployment started on `date`
+      - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME
+      - kubectl config set-context --current --namespace=$EKS_NAMESPACE
       - kubectl set image deployment/$DEPLOYMENT_NAME $SIMPLE_HTTP_CONTAINER_NAME=$DOCKER_IMAGE
       - kubectl rollout status deployment/$DEPLOYMENT_NAME --timeout=5m
       - echo Deployment finished on `date`

@@ -91,7 +91,10 @@ module "simple_http_pipeline" {
   source                = "./modules/simple-http-pipeline"
   code_commit_repo_name = var.code_commit_repo_name
   repository_branch     = var.repository_branch
-  eks_cluster_name      = module.eks_cluster.simple_http_cluster.id
+  eks_cluster_config = {
+    name = module.eks_cluster.simple_http_cluster.id
+    arn  = module.eks_cluster.simple_http_cluster.arn
+  }
   staging_environment_config = {
     name                           = "staging"
     image_repository_url           = module.simple_app_staging_setup.ecr_repo.repository_url
