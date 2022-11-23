@@ -5,9 +5,11 @@ phases:
       - DOCKER_IMAGE=309548668818.dkr.ecr.us-east-1.amazonaws.com/simplehttp-staging:ac1568eab9d7dc55661445940629af8ad07ce19e
   build:
     commands:
+      - whoami
       - echo Deployment started on `date`
       - aws eks update-kubeconfig --name $EKS_CLUSTER_NAME
       - kubectl config set-context --current --namespace=$EKS_NAMESPACE
+      - whoami
       - kubectl set image deployment/$DEPLOYMENT_NAME $SIMPLE_HTTP_CONTAINER_NAME=$DOCKER_IMAGE
       - kubectl rollout status deployment/$DEPLOYMENT_NAME --timeout=5m
       - echo Deployment finished on `date`
