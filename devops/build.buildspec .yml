@@ -1,0 +1,12 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - DOCKER_IMAGE=$IMAGE_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
+  build:
+    commands:
+      - echo Started Building the images on `date`
+      - docker build -t $DOCKER_IMAGE --build-arg dynamic_node_env=$NODE_ENV simple-nodejs-http-app
+      - echo Build finished on `date`
