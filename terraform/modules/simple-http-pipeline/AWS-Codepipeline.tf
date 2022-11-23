@@ -40,7 +40,7 @@ resource "aws_codepipeline" "default_pipeline" {
       }
     }
     action {
-      name            = "Build"
+      name            = "Testing"
       category        = "Test"
       owner           = "AWS"
       provider        = "CodeBuild"

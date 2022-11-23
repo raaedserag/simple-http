@@ -5,6 +5,8 @@ locals {
       AWS_DEFAULT_REGION = data.aws_region.current.name
       AWS_ACCOUNT_ID     = data.aws_caller_identity.current.account_id
       IMAGE_NAME         = var.staging_environment_config.image_repository_url
+      DEPLOYMENT_NAME   = var.staging_environment_config.deployment_name
+      SIMPLE_HTTP_CONTAINER_NAME = var.staging_environment_config.simple_http_app_container_name
     }
   )
 }

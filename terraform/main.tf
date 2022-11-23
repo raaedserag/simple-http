@@ -92,15 +92,19 @@ module "simple_http_pipeline" {
   code_commit_repo_name = var.code_commit_repo_name
   repository_branch     = var.repository_branch
   staging_environment_config = {
-    name                 = "staging"
-    image_repository_url = "${module.simple_app_staging_setup.ecr_repo.repository_url}"
-    image_repository_arn = "${module.simple_app_staging_setup.ecr_repo.arn}"
-    environment_variables = module.simple_app_staging_setup.app_environment_variables
+    name                           = "staging"
+    image_repository_url           = "${module.simple_app_staging_setup.ecr_repo.repository_url}"
+    image_repository_arn           = "${module.simple_app_staging_setup.ecr_repo.arn}"
+    environment_variables          = module.simple_app_staging_setup.app_environment_variables
+    deployment_name                = module.simple_app_staging_setup.app_deployment_name
+    simple_http_app_container_name = module.simple_app_staging_setup.simple_http_app_container_name
   }
   production_environment_config = {
-    name                 = "production"
-    image_repository_url = "${module.simple_app_production_setup.ecr_repo.repository_url}"
-    image_repository_arn = "${module.simple_app_production_setup.ecr_repo.arn}"
-    environment_variables = module.simple_app_production_setup.app_environment_variables
+    name                           = "production"
+    image_repository_url           = "${module.simple_app_production_setup.ecr_repo.repository_url}"
+    image_repository_arn           = "${module.simple_app_production_setup.ecr_repo.arn}"
+    environment_variables          = module.simple_app_production_setup.app_environment_variables
+    deployment_name                = module.simple_app_production_setup.app_deployment_name
+    simple_http_app_container_name = module.simple_app_production_setup.simple_http_app_container_name
   }
 }
