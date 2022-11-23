@@ -53,16 +53,17 @@ resource "aws_codepipeline" "default_pipeline" {
       }
       run_order = 3
     }
-    # action {
-    #   name            = "Build"
-    #   category        = "Build"
-    #   owner           = "AWS"
-    #   provider        = "CodeBuild"
-    #   input_artifacts = ["source_output"]
-    #   version         = "1"
-    #   configuration = {
-    #     ProjectName = aws_codebuild_project.staging_build.name
-    #   }
-    # }
+    action {
+      name            = "Build"
+      category        = "Build"
+      owner           = "AWS"
+      provider        = "CodeBuild"
+      input_artifacts = ["source_output"]
+      version         = "1"
+      configuration = {
+        ProjectName = aws_codebuild_project.staging_deploy.name
+      }
+      run_order = 4
+    }
   }
 }
