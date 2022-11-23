@@ -54,7 +54,7 @@ resource "aws_codepipeline" "default_pipeline" {
       run_order = 3
     }
     action {
-      name            = "Build"
+      name            = "Deploy"
       category        = "Build"
       owner           = "AWS"
       provider        = "CodeBuild"
