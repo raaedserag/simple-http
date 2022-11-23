@@ -29,6 +29,30 @@ resource "aws_codepipeline" "default_pipeline" {
   stage {
     name = "Staging"
     action {
+      name            = "Build"
+      category        = "Build"
+      owner           = "AWS"
+      provider        = "CodeBuild"
+      input_artifacts = ["source_output"]
+      version         = "1"
+      configuration = {
+        ProjectName = aws_codebuild_project.staging_build.name
+      }
+      run_order = 2
+    }
+    action {
+      name            = "Testing"
+      category        = "Test"
+      owner           = "AWS"
+      provider        = "CodeBuild"
+      input_artifacts = ["source_output"]
+      version         = "1"
+      configuration = {
+        ProjectName = aws_codebuild_project.staging_test.name
+      }
+      run_order = 3
+    }
+    action {
       name            = "Deploy"
       category        = "Build"
       owner           = "AWS"
@@ -36,46 +60,9 @@ resource "aws_codepipeline" "default_pipeline" {
       input_artifacts = ["source_output"]
       version         = "1"
       configuration = {
-        ProjectName = aws_codebuild_project.staging_deploy2.name
+        ProjectName = aws_codebuild_project.staging_deploy.name
       }
-      run_order = 2
+      run_order = 4
     }
-
-    # action {
-    #   name            = "Build"
-    #   category        = "Build"
-    #   owner           = "AWS"
-    #   provider        = "CodeBuild"
-    #   input_artifacts = ["source_output"]
-    #   version         = "1"
-    #   configuration = {
-    #     ProjectName = aws_codebuild_project.staging_build.name
-    #   }
-    #   run_order = 2
-    # }
-    # action {
-    #   name            = "Testing"
-    #   category        = "Test"
-    #   owner           = "AWS"
-    #   provider        = "CodeBuild"
-    #   input_artifacts = ["source_output"]
-    #   version         = "1"
-    #   configuration = {
-    #     ProjectName = aws_codebuild_project.staging_test.name
-    #   }
-    #   run_order = 3
-    # }
-    # action {
-    #   name            = "Deploy"
-    #   category        = "Build"
-    #   owner           = "AWS"
-    #   provider        = "CodeBuild"
-    #   input_artifacts = ["source_output"]
-    #   version         = "1"
-    #   configuration = {
-    #     ProjectName = aws_codebuild_project.staging_deploy.name
-    #   }
-    #   run_order = 4
-    # }
   }
 }
