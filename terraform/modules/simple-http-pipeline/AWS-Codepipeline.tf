@@ -23,6 +23,7 @@ resource "aws_codepipeline" "default_pipeline" {
         BranchName           = var.repository_branch
         PollForSourceChanges = "false"
       }
+      run_order = 1
     }
   }
   stage {
@@ -38,6 +39,7 @@ resource "aws_codepipeline" "default_pipeline" {
       configuration = {
         ProjectName = aws_codebuild_project.staging_build.name
       }
+      run_order = 2
     }
     action {
       name            = "Testing"
@@ -49,6 +51,7 @@ resource "aws_codepipeline" "default_pipeline" {
       configuration = {
         ProjectName = aws_codebuild_project.staging_test.name
       }
+      run_order = 3
     }
     # action {
     #   name            = "Build"
