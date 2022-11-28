@@ -8,6 +8,7 @@ This is a simple Node.js http server that is deployed to EKS using AWS Developer
 - [Node.js v18.12.1](https://nodejs.org/en/download/)
 - [Docker](https://docs.docker.com/engine/install/)
 - [Terraform](https://developer.hashicorp.com/terraform/downloads)
+- [Kubectl](https://kubernetes.io/docs/tasks/tools/)
 
 # Prepare the Node.js http server app
 
@@ -143,7 +144,7 @@ Welcome to a simple HTTP app, current server time is 11/19/2022, 5:02:54 PM
 
 You can view code changes in this [commit](https://github.com/BespinGlobalMEA/cloud-devops-engineer-hiring---bespinglobal-mea-raaedserag/commit/dd2de7efe79335070fd8632324c9520368f9ddbf)
 
-# Prepare Kubernetes Infrastructure
+# Deploy Kubernetes Infrastructure
 As we decided to deploy the app on a kubernetes cluster, we need to prepare the infrastructure first, in order to do this we will use [Terraform](https://www.terraform.io/) to provision the infrastructure.
 
 ## Prepare & Configure Terraform
@@ -164,7 +165,6 @@ As we decided to deploy the app on a kubernetes cluster, we need to prepare the 
         --profile sandbox-account
     ```
 3. Configure [main.tf](./terraform/main.tf) file, this file will contain the terraform configuration as follows:
-    - Use `aws` provider version `4.40.0` or higher
     - Use terraform version `1.3.5` or higher
     - the default aws profile will be specified using `AWS_PROFILE` environment variable
     - Use `s3` as a backend to store the terraform state
@@ -196,3 +196,85 @@ Now, let's create the EKS cluster, for high availability we will create the node
 ![EKS Cluster](./docs/assets/eks-cluster.png)
 
 You can view code changes in this [commit](https://github.com/BespinGlobalMEA/cloud-devops-engineer-hiring---bespinglobal-mea-raaedserag/commit/dd5b2811f55e51f8d3cc76584fe0ef01d58ba067)
+
+### Configure Additional EKS Admin  Role
+By default, EKS configures the `aws-auth` ConfigMap to allow the IAM user or role that creates the cluster to make calls to AWS API operations on your behalf, in addition to the worker nodes role binding.
+
+The problem here is we will need for an additional admin role to automate the cluster deployments, so we will create a new role and add it to the `aws-auth` ConfigMp, to do this we will do the following:
+
+1. Create a terraform module to handle k8s configuration generally and `Config Map` specially.
+2. Import the existing `aws-auth` ConfigMap to terraform state if not exist.
+3. Separate the terraform module deployments into multiple calls, and refactor the `Makefile` ro maintain the order of the calls.
+
+You can view code changes in this [commit](https://github.com/BespinGlobalMEA/cloud-devops-engineer-hiring---bespinglobal-mea-raaedserag/commit/7f24e9dc929f0fedd7c4a73d2a353ba4a5b6f549)
+
+# Deploy Simple Http Application to Kubernetes
+Once the Kubernetes cluster is ready, we will deploy the simple http application to it, since this cluster can be used for multiple applications in multiple environments, we will specify the application environment setup in a separate terraform paramerized module, so we can call it multiple times to construct each environment.
+
+The Simple Http Application single environment setup (staging)will be as the diagram below:
+
+![Simple Http Application](./docs/assets/environment-setup.png)
+
+This setup will include the following:
+- `Namespace` to isolate the application environment resources.
+- `Secret` to store the application configuration secrets.
+- `Deployment` which includes the application pods, we have 2 pods to support high availability.
+- `Service` to expose the application pods to the internet.
+- `ECR Repository` to store the application docker image.
+- `RDS Database` to store the application data.
+
+And we will use the module again to create the second environment (production).
+
+So, the final Kubernetes cluster will be as the diagram below:
+
+![Kubernetes Cluster](./docs/assets/final-k8s-cluster.png)
+
+You can view code changes in this [commit](https://github.com/BespinGlobalMEA/cloud-devops-engineer-hiring---bespinglobal-mea-raaedserag/commit/0cdbfaffbb244654a5821c02968cf0be96738b60)
+
+# CI/CD Pipeline
+Now, we will create a CI/CD pipeline module to automate the application deployment, we will use some of [AWS Develoer Tools](https://aws.amazon.com/products/developer-tools/)
+
+## CodeCommit & AWS Events Trigger
+In order to start, we should store he application code in a centralized repository, so we will use [CodeCommit](https://aws.amazon.com/codecommit/) to store the application code, so we will do the following:
+
+1. Create CodeCommit repository.
+    ```bash
+    aws codecommit create-repository \
+        --repository-name simple-http-repo \
+        --repository-description "Simple Http Application" \
+        --profile sandbox-account
+    # Output should be like this:
+    "repositoryMetadata": {
+        "accountId": "xxxx",
+        "repositoryId": "xxxxx",
+        "repositoryName": "simple-http-repo",
+        "repositoryDescription": "Simple Http Application",
+        "lastModifiedDate": "2022-11-23T08:34:31.297000+02:00",
+        "creationDate": "2022-11-23T08:34:31.297000+02:00",
+        "cloneUrlHttp": "https://git-codecommit.region.amazonaws.com/v1/repos/simple-http-repo",
+        "cloneUrlSsh": "ssh://git-codecommit.region.amazonaws.com/v1/repos/simple-http-repo",
+        "Arn": "arn:aws:codecommit:region:xxxxx:simple-http-repo"
+    }
+    ```
+2. Then, you should configure your local git repository to push to CodeCommit, you can follow this [guide](https://docs.aws.amazon.com/codecommit/latest/userguide/setting-up-https-unixes.html).
+3. Finally, push the application code to CodeCommit.
+
+We will create a trigger to notify the pipeline when there is a new commit in the CodeCommit repository, we will use AWS Events, you can check the code changes in this [commit](https://github.com/BespinGlobalMEA/cloud-devops-engineer-hiring---bespinglobal-mea-raaedserag/commit/ae55e8e53e94ef65f377228322a38407de81f206)
+
+## Build Images (CodeBuild)
+To build the application docker image, we will use [CodeBuild](https://aws.amazon.com/codebuild/), specs can be found in [build.buildspec.yml](./devops/build.buildspec.yml)
+
+## Test Images (CodeBuild & Test Coverage Report)
+We will use `CodeBuild` to run the application unit tests, and to generate the test coverage report using `Jest`, you can check the code changes in this [commit](https://github.com/BespinGlobalMEA/cloud-devops-engineer-hiring---bespinglobal-mea-raaedserag/commit/86d97c1cadfa25fb19a64b95abe4c45dbde158c4), specs can be found in [testing.buildspec.yml](./devops/testing.buildspec.yml)
+
+**Note:** Testing phase will only run in the staging environment.
+
+## Deploy Images (CodeBuild & Kubectl)
+We will use `CodeBuild` to update the application docker image of the environment deployment, specs can be found in [deploy.buildspec.yml](./devops/deploy.buildspec.yml)
+
+## Final Pipeline
+The final pipeline will be as the diagram below:
+
+![Pipeline](./docs/assets/cicd.png)
+
+You can view code changes in this [commit](https://github.com/BespinGlobalMEA/cloud-devops-engineer-hiring---bespinglobal-mea-raaedserag/commit/26e107d059654cd0af44969149bcd4f7d60f1068)

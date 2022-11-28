@@ -16,6 +16,7 @@ resource "aws_iam_role" "eks_cluster_service_role" {
   })
 }
 
+
 # EKS Control Plane Security Group
 resource "aws_security_group" "Eks_ControlPlane_SG" {
   name        = "Eks_Cluster_SG"
@@ -32,6 +33,7 @@ resource "aws_security_group_rule" "Eks_ControlPlane_SG_recommended_outbound" {
   ipv6_cidr_blocks  = ["::/0"]
   security_group_id = aws_security_group.Eks_ControlPlane_SG.id
 }
+
 
 # EKS Cluster Configuration
 resource "aws_eks_cluster" "main_eks" {
